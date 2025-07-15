@@ -169,6 +169,7 @@
 <body>
     <div class="score-panel">
         <div>分数: <span id="score">0</span></div>
+        <div>速度: <span id="speed">中</span></div>
         <div>最高分: <span id="highScore">0</span></div>
     </div>
     <div class="game-container">
@@ -182,6 +183,8 @@
     <div class="controls">
         <button onclick="startGame()">开始游戏</button>
         <button onclick="pauseGame()">暂停</button>
+        <button onclick="increaseSpeed()">加速</button>
+        <button onclick="decreaseSpeed()">减速</button>
     </div>
     
     <!-- 移动端触摸控制 -->
@@ -377,6 +380,7 @@
             score = 0;
             scoreElement.textContent = score;
             gameSpeed = INITIAL_SPEED;
+            updateSpeedDisplay(); // 更新速度显示
             isPaused = false;
             gameOverElement.style.display = 'none';
 
@@ -391,6 +395,44 @@
         function pauseGame() {
             isPaused = !isPaused;
             draw(); // 立即重绘以显示暂停状态
+        }
+
+        // 增加游戏速度
+        function increaseSpeed() {
+            if (gameSpeed > 50) { // 最小间隔50ms
+                gameSpeed -= 10;
+                updateSpeedDisplay();
+                if (gameLoopId) {
+                    clearInterval(gameLoopId);
+                    gameLoopId = setInterval(gameLoop, gameSpeed);
+                }
+            }
+        }
+
+        // 降低游戏速度
+        function decreaseSpeed() {
+            if (gameSpeed < 300) { // 最大间隔300ms
+                gameSpeed += 10;
+                updateSpeedDisplay();
+                if (gameLoopId) {
+                    clearInterval(gameLoopId);
+                    gameLoopId = setInterval(gameLoop, gameSpeed);
+                }
+            }
+        }
+
+        // 更新速度显示
+        function updateSpeedDisplay() {
+            const speedElement = document.getElementById('speed');
+            if (!speedElement) return;
+            
+            if (gameSpeed <= 80) {
+                speedElement.textContent = '快';
+            } else if (gameSpeed >= 200) {
+                speedElement.textContent = '慢';
+            } else {
+                speedElement.textContent = '中';
+            }
         }
 
         // 游戏结束
@@ -450,6 +492,7 @@
         createSnake();
         generateFood();
         draw();
+        updateSpeedDisplay(); // 初始化速度显示
     </script>
 </body>
 </html>
